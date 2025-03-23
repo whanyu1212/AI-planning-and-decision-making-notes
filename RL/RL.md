@@ -14,6 +14,9 @@ Cn view it as a form of Policy evaluation without known dynamics & reward models
   - [On Policy Monte Carlo](#on-policy-monte-carlo)
   - [On Policy vs Off Policy](#on-policy-vs-off-policy)
 - [Temporal-Difference (TD) Learning](#temporal-difference-td-learning)
+  - [Tabular TD(0) for Estimating (V^\\pi)](#tabular-td0-for-estimating-vpi)
+- [SARSA: On-Policy TD Control](#sarsa-on-policy-td-control)
+- [Q-Learning: Off Policy TD Control](#q-learning-off-policy-td-control)
 
 
 ---
@@ -32,6 +35,8 @@ Cn view it as a form of Policy evaluation without known dynamics & reward models
 **Model-Free vs. Model-Based:**
 - The statement more closely describes model-free RL.
 - In model-based RL, even though the dynamics might initially be unknown, the agent tries to learn a model of the environment and then uses it for planning and policy evaluation.
+
+---
 
 ### Monte Carlo (MC) Policy Evaluation
 - \( V^\pi(s) = \mathbb{E}_{\tau \sim \pi}[G_t \mid s_t = s] \)
@@ -266,6 +271,7 @@ a method for finding an optimal policy in a Markov Decision Process (MDP) by rep
 - We want to use old experience to still improve the target policy
 - We want b to be more exploratory than π (which out to be greedy)
 
+---
 
 ### Temporal-Difference (TD) Learning
 
@@ -303,3 +309,70 @@ V(s_t) \;\leftarrow\; V(s_t) \;+\; \alpha \,\bigl[r_t + \gamma \, V(s_{t+1}) - V
   - The update nudges \(V(s_t)\) toward the bootstrapped target \(\bigl[r_t + \gamma \, V(s_{t+1})\bigr]\).
 
 In many cases, **TD learning** can be more efficient because it updates more frequently and doesn’t require the episode to terminate before making a learning step.
+
+#### Tabular TD(0) for Estimating \(V^\pi\)
+
+**Input**: The policy \(\pi\) to be evaluated
+
+1. **Initialize** \(V(s)\) arbitrarily (e.g., \(V(s) = 0\) for all \(s \in S^+\)).
+
+2. **Repeat** (for each episode):
+   1. **Initialize** \(S\).
+   2. **Repeat** (for each step of the episode):
+      - \(A \leftarrow\) action given by \(\pi\) for \(S\).
+      - Take action \(A\); observe reward \(R\) and next state \(S'\).
+      - \( V(S) \leftarrow V(S) + \alpha \bigl[R + \gamma \, V(S') - V(S)\bigr] \)
+      - \(S \leftarrow S'\).
+   3. **Until** \(S\) is terminal.
+
+---
+
+### SARSA: On-Policy TD Control
+- An acronym for State–Action–Reward–State–Action
+- At each step, it selects the next action using the same ε-greedy policy it’s learning about.
+- Learns the value of the action actually taken by the current policy
+
+After observing the transition \((S, A, R, S', A')\), the update for \(Q(S,A)\) is:
+
+\( Q(S,A) \leftarrow Q(S,A) + \alpha \, [R + \gamma\,Q(S', A') - Q(S,A)] \).
+
+Here, \(A'\) is chosen by the current \(\varepsilon\)-greedy policy from the next state \(S'\).
+
+
+1. **Initialize** \(Q(s,a)\) for all \(s \in S, a \in A(s)\) arbitrarily, and set \(Q(\text{terminal-state}, \cdot) = 0\).
+
+2. **Repeat** (for each episode):
+   - **Initialize** \(S\).
+   - **Choose** \(A\) from \(S\) using a policy derived from \(Q\) (e.g., \(\varepsilon\)-greedy).
+
+   - **Repeat** (for each step of the episode):
+     1. Take action \(A\), observe \(R\) and \(S'\).
+     2. Choose \(A'\) from \(S'\) using a policy derived from \(Q\) (e.g., \(\varepsilon\)-greedy).
+     3. Update:
+        \( Q(S, A) \leftarrow Q(S, A) + \alpha \,\bigl[R + \gamma\,Q(S', A') - Q(S, A)\bigr] \)
+     4. \(S \leftarrow S'\); \(A \leftarrow A'\).
+
+   - **Until** \(S\) is terminal.
+
+---
+
+### Q-Learning: Off Policy TD Control
+- **Action-Value Function \(Q(s,a)\):**  
+  This function represents the expected return (sum of discounted rewards) when taking action \(a\) in state \(s\) and then following the optimal policy thereafter:
+  \[
+  Q^*(s,a) = \mathbb{E}\left[R_{t+1} + \gamma \max_{a'} Q^*(S_{t+1}, a') \mid S_t = s, A_t = a\right].
+  \]
+
+<br>
+
+1. **Initialize** \(Q(s,a)\) for all \(s \in S, a \in A(s)\) arbitrarily, and set \(Q(\text{terminal-state}, \cdot) = 0\).
+
+2. **Repeat** (for each episode):
+   - **Initialize** \(S\).
+   - **Choose** \(A\) from \(S\) using a policy derived from \(Q\) (e.g., \(\varepsilon\)-greedy).
+   - **Take** action \(A\), observe \(R\) and \(S'\).
+   - **Update**:
+     \( Q(S, A) \leftarrow Q(S, A) + \alpha \,\bigl[R + \gamma \,\max_{a} Q(S', a) - Q(S, A)\bigr] \)
+   - \(S \leftarrow S'\)
+
+   - **Until** \(S\) is terminal.
