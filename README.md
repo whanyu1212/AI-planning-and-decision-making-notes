@@ -9,5 +9,5 @@ A collection of notes that cover the concepts and code snippet for `Classical AI
 - Rational and Judgmental Decision Making
 - Decision Networks
 - [Markov Decision Process](/MDP)
-- Reinforcement Learning
+- [Reinforcement Learning](/RL/)
 - Game Theory and Multi-agent Decision Making

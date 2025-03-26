@@ -1,5 +1,5 @@
 <!-- omit in toc -->
-# Reinforcement Learning
+# Reinforcement Learning Part 1
 
 Cn view it as a form of Policy evaluation without known dynamics & reward models for simplicity
 
